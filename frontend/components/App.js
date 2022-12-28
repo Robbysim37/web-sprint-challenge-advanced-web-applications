@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import axiosWithAuth from '../axios'
 import Articles from './Articles'
 import LoginForm from './LoginForm'
 import Message from './Message'
 import ArticleForm from './ArticleForm'
 import Spinner from './Spinner'
+import PrivateRoute from './PrivateRoute'
 
 const articlesUrl = 'http://localhost:9000/api/articles'
 const loginUrl = 'http://localhost:9000/api/login'
@@ -27,6 +30,9 @@ export default function App() {
     // and a message saying "Goodbye!" should be set in its proper state.
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
+    localStorage.removeItem("token")
+    setMessage("Goodbye!")
+    navigate("/")
   }
 
   const login = ({ username, password }) => {
@@ -36,6 +42,18 @@ export default function App() {
     // On success, we should set the token to local storage in a 'token' key,
     // put the server success message in its proper state, and redirect
     // to the Articles screen. Don't forget to turn off the spinner!
+
+    setMessage("")
+    setSpinnerOn(true)
+    axios.post("http://localhost:9000/api/login",{username:username.trim(),password:password.trim()})
+    .then(res => {
+      console.log(res.data)
+      localStorage.setItem("token",res.data.token)
+      setMessage(res.data.message)
+      navigate("/articles")
+      setSpinnerOn(false)
+    })
+    .catch(err => console.log(err))
   }
 
   const getArticles = () => {
@@ -47,6 +65,16 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
+
+    setMessage("")
+    setSpinnerOn(true)
+    axiosWithAuth().get("/articles")
+    .then(res => {
+      setArticles(res.data.articles)
+      setMessage(res.data.message)
+      setSpinnerOn(false)
+    })
+    .catch(err => console.log(err))
   }
 
   const postArticle = article => {
@@ -54,6 +82,17 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+
+    setMessage("")
+    setSpinnerOn(true)
+    axiosWithAuth().post("/articles",article)
+    .then(res => {
+      console.log(res.data)
+      setArticles([...articles, res.data.article])
+      setMessage(res.data.message)
+      setSpinnerOn(false)
+    })
+    .catch(err => console.log(err))
   }
 
   const updateArticle = ({ article_id, article }) => {
@@ -68,8 +107,8 @@ export default function App() {
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <>
-      <Spinner />
-      <Message />
+      <Spinner on={spinnerOn}/>
+      <Message message={message} />
       <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
         <h1>Advanced Web Applications</h1>
@@ -78,13 +117,15 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
-          <Route path="articles" element={
-            <>
-              <ArticleForm />
-              <Articles />
-            </>
-          } />
+          <Route path="/" element={<LoginForm loginFunc={login} />} />
+          <Route element={<PrivateRoute/>}>
+            <Route path="articles" element={
+              <>
+              <ArticleForm postArticle={postArticle}/>
+              <Articles getArticles={getArticles} articles={articles}/>
+              </>
+            }/>
+          </Route>
         </Routes>
         <footer>Bloom Institute of Technology 2022</footer>
       </div>

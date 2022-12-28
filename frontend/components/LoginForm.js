@@ -1,12 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import PT from 'prop-types'
+import * as yup from "yup"
+import axios from 'axios'
+import { useNavigate } from "react-router-dom"
+
+const loginSchema = yup.object().shape({
+  username: yup.string().required("Please enter Username").min(3,"Username must be at least 3 characters"),
+  password: yup.string().required("Please enter Password").min(8,"Password must be at least 8 chatacters") 
+})
 
 const initialFormValues = {
   username: '',
   password: '',
 }
 export default function LoginForm(props) {
+  const navigate = useNavigate()
   const [values, setValues] = useState(initialFormValues)
+  const [isButtonDisabled,setIsButtonDisabled] = useState(true)
   // ✨ where are my props? Destructure them here
 
   const onChange = evt => {
@@ -17,14 +27,16 @@ export default function LoginForm(props) {
   const onSubmit = evt => {
     evt.preventDefault()
     // ✨ implement
+    props.loginFunc({username:values.username,password:values.password})
   }
 
-  const isDisabled = () => {
-    // ✨ implement
-    // Trimmed username must be >= 3, and
-    // trimmed password must be >= 8 for
-    // the button to become enabled
-  }
+  useEffect(()=>{
+    const tempValues = {
+      username: values.username.trim(),
+      password: values.password.trim()
+    }
+    loginSchema.isValid(tempValues).then(valid => setIsButtonDisabled(!valid))
+  },[values])
 
   return (
     <form id="loginForm" onSubmit={onSubmit}>
@@ -43,7 +55,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={isDisabled()} id="submitCredentials">Submit credentials</button>
+      <button disabled={isButtonDisabled} id="submitCredentials">Submit credentials</button>
     </form>
   )
 }
