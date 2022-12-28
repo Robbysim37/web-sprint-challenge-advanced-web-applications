@@ -102,6 +102,14 @@ export default function App() {
 
   const deleteArticle = article_id => {
     // ✨ implement
+    setMessage("")
+    setSpinnerOn(true)
+    axiosWithAuth().delete(`/articles/${article_id}`)
+    .then(res => {
+      setArticles(articles.filter(el => el.article_id != article_id))
+      setSpinnerOn(false)
+      setMessage(res.data.message)
+    })
   }
 
   return (
@@ -121,8 +129,8 @@ export default function App() {
           <Route element={<PrivateRoute/>}>
             <Route path="articles" element={
               <>
-              <ArticleForm postArticle={postArticle}/>
-              <Articles getArticles={getArticles} articles={articles}/>
+              <ArticleForm postArticle={postArticle} articles={articles}/>
+              <Articles deleteArticle={deleteArticle} getArticles={getArticles} articles={articles}/>
               </>
             }/>
           </Route>

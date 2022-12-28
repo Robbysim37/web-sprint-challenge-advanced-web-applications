@@ -16,6 +16,10 @@ export default function Articles(props) {
     props.getArticles()
   },[])
 
+  const deleteButtonClickHandler = (e) => {
+    props.deleteArticle(e.target.id)
+  }
+
   return (
     // ✨ fix the JSX: replace `Function.prototype` with actual functions
     // and use the articles prop to generate articles
@@ -34,7 +38,7 @@ export default function Articles(props) {
                 </div>
                 <div>
                   <button disabled={true} onClick={Function.prototype}>Edit</button>
-                  <button disabled={true} onClick={Function.prototype}>Delete</button>
+                  <button id={art.article_id} disabled={false} onClick={deleteButtonClickHandler}>Delete</button>
                 </div>
               </div>
             )
