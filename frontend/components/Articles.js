@@ -20,6 +20,10 @@ export default function Articles(props) {
     props.deleteArticle(e.target.id)
   }
 
+  const editButtonClickHandler = (e) => {
+    props.setFormToEdit(e.target.id)
+  }
+
   return (
     // ✨ fix the JSX: replace `Function.prototype` with actual functions
     // and use the articles prop to generate articles
@@ -37,7 +41,7 @@ export default function Articles(props) {
                   <p>Topic: {art.topic}</p>
                 </div>
                 <div>
-                  <button disabled={true} onClick={Function.prototype}>Edit</button>
+                  <button id={art.article_id} disabled={false} onClick={editButtonClickHandler}>Edit</button>
                   <button id={art.article_id} disabled={false} onClick={deleteButtonClickHandler}>Delete</button>
                 </div>
               </div>

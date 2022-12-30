@@ -12,7 +12,11 @@ export default function ArticleForm(props) {
     // Every time the `currentArticle` prop changes, we should check it for truthiness:
     // if it's truthy, we should set its title, text and topic into the corresponding
     // values of the form. If it's not, we should reset the form back to initial values.
-  })
+    if(props.currentArticleId){
+      const articleToEdit = props.articles.filter(el => el.article_id == props.currentArticleId)[0]
+      setValues({title: articleToEdit.title, text: articleToEdit.text, topic: articleToEdit.topic})
+    }
+  },[props.currentArticleId])
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -24,12 +28,22 @@ export default function ArticleForm(props) {
     // ✨ implement
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
-    props.postArticle({...values,article_id:props.articles.length + 1})
+    if(props.currentArticleId){
+      props.updateArticle({article_id:props.currentArticleId,article:values})
+    }else{
+      props.postArticle({...values,article_id:props.articles.length + 1})
+    }
+    clearForm()
   }
 
   const isDisabled = () => {
     // ✨ implement
     // Make sure the inputs have some values
+  }
+
+  const clearForm = (e) => {
+    setValues(initialFormValues)
+    props.setCurrentArticleId(null)
   }
 
   return (
@@ -59,7 +73,7 @@ export default function ArticleForm(props) {
       </select>
       <div className="button-group">
         <button disabled={isDisabled()} id="submitArticle">Submit</button>
-        <button onClick={Function.prototype}>Cancel edit</button>
+        <button onClick={clearForm}>Cancel edit</button>
       </div>
     </form>
   )
