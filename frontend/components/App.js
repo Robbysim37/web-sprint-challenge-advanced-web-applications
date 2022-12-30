@@ -95,9 +95,24 @@ export default function App() {
     .catch(err => console.log(err))
   }
 
+  const setFormToEdit = (article_id) => {
+    setCurrentArticleId(article_id)
+  }
+
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    console.log(article_id , article)
+    setMessage("")
+    setSpinnerOn(true)
+    axiosWithAuth().put(`/articles/${article_id}`,article)
+    .then(res => {
+      console.log(res.data.article)
+      console.log(articles)
+      setArticles(articles.map(el => el.article_id == article_id ? res.data.article : el))
+      setMessage(res.data.message)
+      setSpinnerOn(false)
+    })
   }
 
   const deleteArticle = article_id => {
@@ -129,8 +144,13 @@ export default function App() {
           <Route element={<PrivateRoute/>}>
             <Route path="articles" element={
               <>
-              <ArticleForm postArticle={postArticle} articles={articles}/>
-              <Articles deleteArticle={deleteArticle} getArticles={getArticles} articles={articles}/>
+              <ArticleForm 
+              currentArticleId={currentArticleId} 
+              postArticle={postArticle} 
+              articles={articles}
+              setCurrentArticleId={setCurrentArticleId}
+              updateArticle={updateArticle}/>
+              <Articles setFormToEdit={setFormToEdit} deleteArticle={deleteArticle} getArticles={getArticles} articles={articles}/>
               </>
             }/>
           </Route>

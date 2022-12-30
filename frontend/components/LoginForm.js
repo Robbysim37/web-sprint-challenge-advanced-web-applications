@@ -55,7 +55,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={isButtonDisabled} id="submitCredentials">Submit credentials</button>
+      <button disabled={false} id="submitCredentials">Submit credentials</button>
     </form>
   )
 }
