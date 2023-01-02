@@ -20,6 +20,7 @@ export default function LoginForm(props) {
   // ✨ where are my props? Destructure them here
 
   const onChange = evt => {
+    console.log(values)
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
   }
@@ -28,6 +29,14 @@ export default function LoginForm(props) {
     evt.preventDefault()
     // ✨ implement
     props.loginFunc({username:values.username,password:values.password})
+  }
+
+  const formValidation = () => {
+    if(values.username.trim().length >= 3 && values.password.trim().length >= 8){
+      return false
+    }else{
+      return true
+    }
   }
 
   useEffect(()=>{
@@ -55,7 +64,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={false} id="submitCredentials">Submit credentials</button>
+      <button disabled={formValidation()} id="submitCredentials">Submit credentials</button>
     </form>
   )
 }
