@@ -39,6 +39,13 @@ export default function ArticleForm(props) {
   const isDisabled = () => {
     // ✨ implement
     // Make sure the inputs have some values
+    if(values.topic){
+        if(values.title.trim().length >= 1 && values.text.trim().length >= 1){
+          return false
+        }
+    }else{
+      return true
+    }
   }
 
   const clearForm = (e) => {
@@ -73,7 +80,7 @@ export default function ArticleForm(props) {
       </select>
       <div className="button-group">
         <button disabled={isDisabled()} id="submitArticle">Submit</button>
-        <button onClick={clearForm}>Cancel edit</button>
+        <button type={"button"} onClick={clearForm}>Cancel edit</button>
       </div>
     </form>
   )
